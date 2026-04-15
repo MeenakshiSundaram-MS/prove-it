@@ -12,7 +12,7 @@ Installs hooks, detects your test framework, adds blue `[PROVE-IT]` badge to sta
 
 ### Cursor
 ```bash
-npx prove-it install
+npx @gaming.big/prove-it install
 ```
 Copies `.cursor/rules/prove-it.mdc` (always-on) + opt-in `prove-it-tdd.mdc` and `prove-it-strict.mdc`.
 Toggle modes in Cursor Settings → Rules.

@@ -61,14 +61,14 @@ Status: PASS ✓
 ### Cursor / Windsurf / Cline (any AI IDE)
 
 ```bash
-npx prove-it install
+npx @gaming.big/prove-it install
 ```
 
 Copies rule files to `.cursor/rules/` in your project. Commit them so your whole team benefits.
 
 ```bash
-npx prove-it install --global   # install to ~/.cursor/rules/ for all projects
-npx prove-it install --only=tdd,strict   # install specific modes only
+npx @gaming.big/prove-it install --global   # install to ~/.cursor/rules/ for all projects
+npx @gaming.big/prove-it install --only=tdd,strict   # install specific modes only
 ```
 
 ### Claude Code

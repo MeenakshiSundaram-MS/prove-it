@@ -3,13 +3,13 @@
  * prove-it CLI — npx entry point
  *
  * Usage:
- *   npx prove-it install
- *   npx prove-it install --global
- *   npx prove-it install --mode=tdd
- *   npx prove-it install --only=commit,review
- *   npx prove-it list
- *   npx prove-it update
- *   npx prove-it uninstall
+ *   npx @gaming.big/prove-it install
+ *   npx @gaming.big/prove-it install --global
+ *   npx @gaming.big/prove-it install --mode=tdd
+ *   npx @gaming.big/prove-it install --only=commit,review
+ *   npx @gaming.big/prove-it list
+ *   npx @gaming.big/prove-it update
+ *   npx @gaming.big/prove-it uninstall
  */
 
 'use strict';
@@ -136,7 +136,7 @@ function cmdUpdate(flags) {
   const rules = ALL_RULES.filter((r) => fs.existsSync(path.join(targetDir, r)));
 
   if (!rules.length) {
-    console.log('No prove-it rules found to update. Run `npx prove-it install` first.');
+    console.log('No prove-it rules found to update. Run `npx @gaming.big/prove-it install` first.');
     return;
   }
 
@@ -176,7 +176,7 @@ function printHelp() {
 prove-it — verification-first workflow for AI coding agents
 
 Usage:
-  npx prove-it <command> [options]
+  npx @gaming.big/prove-it <command> [options]
 
 Commands:
   install     Copy prove-it rules to .cursor/rules/ (default: project-level)
@@ -190,11 +190,11 @@ Options:
   --only=<r>    Install only specific rules (comma-separated: tdd,strict)
 
 Examples:
-  npx prove-it install
-  npx prove-it install --global
-  npx prove-it install --only=tdd,strict
-  npx prove-it install --force
-  npx prove-it list --global
+  npx @gaming.big/prove-it install
+  npx @gaming.big/prove-it install --global
+  npx @gaming.big/prove-it install --only=tdd,strict
+  npx @gaming.big/prove-it install --force
+  npx @gaming.big/prove-it list --global
 `);
 }
 
