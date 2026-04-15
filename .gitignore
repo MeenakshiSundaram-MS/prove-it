@@ -1,6 +1,13 @@
 node_modules/
 .DS_Store
 *.log
+*.tgz
+
+# Per-developer config override (use .prove-it.json for team-wide defaults)
 .prove-it.json
+
+# Build artifacts
 prove-it.skill
+
+# npm debug
 benchmarks/results/*.json
