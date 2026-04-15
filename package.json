@@ -26,9 +26,10 @@
   },
   "license": "MIT",
   "bin": {
-    "prove-it": "./hooks/cli.js"
+    "prove-it": "./bin/prove-it.js"
   },
   "files": [
+    "bin/",
     ".cursor/",
     ".windsurf/",
     ".clinerules/",
