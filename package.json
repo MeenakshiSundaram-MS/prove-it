@@ -1,6 +1,6 @@
 {
   "name": "@developed-by-ms/prove-it",
-  "version": "1.1.0",
+  "version": "0.0.1",
   "description": "Verification-first workflow for AI coding agents. Never say done without proof.",
   "keywords": [
     "ai",
