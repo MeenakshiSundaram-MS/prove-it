@@ -251,6 +251,64 @@ function cmdUninstall(flags) {
   }
 }
 
+function cmdVerify() {
+  const homeDir = os.homedir();
+  const hooksDir = path.join(homeDir, '.claude', 'hooks');
+  const settingsFile = path.join(homeDir, '.claude', 'settings.json');
+
+  const checks = [];
+
+  // Hook files
+  const hookFiles = [
+    'prove-it-activate.js',
+    'prove-it-config.js',
+    'prove-it-mode-tracker.js',
+    'prove-it-statusline.js',
+  ];
+  for (const f of hookFiles) {
+    checks.push({ label: `Hook file: ${f}`, pass: fs.existsSync(path.join(hooksDir, f)) });
+  }
+
+  // settings.json entries
+  let settings = null;
+  try { settings = JSON.parse(fs.readFileSync(settingsFile, 'utf8')); } catch {}
+
+  checks.push({
+    label: 'settings.json: SessionStart hook',
+    pass: !!(settings && (settings.hooks?.SessionStart || []).some(
+      (h) => JSON.stringify(h).includes('prove-it-activate')
+    )),
+  });
+  checks.push({
+    label: 'settings.json: UserPromptSubmit hook',
+    pass: !!(settings && (settings.hooks?.UserPromptSubmit || []).some(
+      (h) => JSON.stringify(h).includes('prove-it-mode-tracker')
+    )),
+  });
+  checks.push({
+    label: 'settings.json: statusLine',
+    pass: !!(settings && settings.statusLine && JSON.stringify(settings.statusLine).includes('prove-it-statusline')),
+  });
+
+  console.log('\nprove-it install check:\n');
+  for (const c of checks) {
+    console.log(`  ${c.pass ? '✓' : '✗'} ${c.label}`);
+  }
+
+  const allPass = checks.every((c) => c.pass);
+  if (allPass) {
+    console.log('\n✓ All checks passed. Start a new Claude Code session to activate.\n');
+  } else {
+    console.log('\n✗ Some checks failed. Re-run the installer:\n');
+    if (process.platform === 'win32') {
+      console.log('  irm https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/hooks/install.ps1 | iex\n');
+    } else {
+      console.log('  bash <(curl -fsSL https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/hooks/install.sh)\n');
+    }
+    process.exitCode = 1;
+  }
+}
+
 function printHelp() {
   console.log(`
 prove-it — verification-first workflow for AI coding agents
@@ -263,6 +321,7 @@ Commands:
   list        Show which rules are installed
   update      Update installed rules to the latest version
   uninstall   Remove prove-it rules
+  verify      Check that the Claude Code hooks are correctly installed
 
 Options:
   --global        Install to ~/.cursor/rules/ instead of project
@@ -280,6 +339,7 @@ Examples:
   npx @developed-by-ms/prove-it install --only=tdd,strict
   npx @developed-by-ms/prove-it install --force
   npx @developed-by-ms/prove-it list --global
+  npx @developed-by-ms/prove-it verify
 `);
 }
 
@@ -293,11 +353,12 @@ function main() {
     case 'list':      cmdList(flags); break;
     case 'update':    cmdUpdate(flags); break;
     case 'uninstall': cmdUninstall(flags); break;
+    case 'verify':    cmdVerify(); break;
     default:          printHelp();
   }
 }
 
-module.exports = { parseArgs, resolveRules, findProjectRoot, getTargetDir, main };
+module.exports = { parseArgs, resolveRules, findProjectRoot, getTargetDir, cmdVerify, main };
 
 if (require.main === module) {
   main();

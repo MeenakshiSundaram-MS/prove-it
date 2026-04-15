@@ -12,6 +12,7 @@
 #   1. Copies (or downloads) hook files to ~/.claude/hooks/
 #   2. Merges hook entries into ~/.claude/settings.json using Node.js
 #   3. Backs up settings.json before modification
+#   4. Verifies the install succeeded
 
 set -euo pipefail
 
@@ -26,7 +27,7 @@ HOOK_FILES=(
   "prove-it-activate.js"
   "prove-it-config.js"
   "prove-it-mode-tracker.js"
-  "prove-it-statusline.sh"
+  "prove-it-statusline.js"
 )
 
 # ─── Parse args ───────────────────────────────────────────────────────────────
@@ -50,7 +51,10 @@ fi
 
 # ─── Checks ───────────────────────────────────────────────────────────────────
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
-  echo "Windows detected. Use hooks/install.ps1 instead."
+  echo "Windows detected. Use the PowerShell installer instead:"
+  echo ""
+  echo "  irm https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/hooks/install.ps1 | iex"
+  echo ""
   exit 1
 fi
 
@@ -83,8 +87,6 @@ for hook_file in "${HOOK_FILES[@]}"; do
     curl -fsSL "$GITHUB_RAW/hooks/$hook_file" -o "$HOOKS_DIR/$hook_file"
   fi
 done
-
-chmod +x "$HOOKS_DIR/prove-it-statusline.sh"
 
 # ─── Backup settings.json ────────────────────────────────────────────────────
 if [[ -f "$SETTINGS_FILE" ]]; then
@@ -142,11 +144,11 @@ if (!alreadyHasPromptHook) {
   settings.hooks.UserPromptSubmit.push(promptHook);
 }
 
-// Statusline
+// Statusline (Node.js script — cross-platform)
 if (!settings.statusLine) {
   settings.statusLine = {
     type: 'command',
-    command: `bash "${path.join(hooksDir, 'prove-it-statusline.sh')}"`
+    command: `node "${path.join(hooksDir, 'prove-it-statusline.js')}"`
   };
 }
 
@@ -175,6 +177,39 @@ else if (findUp('pyproject.toml', cwd) || findUp('setup.py', cwd)) { process.std
 else if (findUp('pom.xml', cwd)) { process.stdout.write('Java (Maven)'); }
 else if (findUp('build.gradle', cwd)) { process.stdout.write('Java (Gradle)'); }
 " 2>/dev/null || true)
+
+# ─── Post-install verification ────────────────────────────────────────────────
+echo ""
+echo "Verifying install..."
+
+VERIFY_OK=true
+
+for hook_file in "${HOOK_FILES[@]}"; do
+  if [[ ! -f "$HOOKS_DIR/$hook_file" ]]; then
+    echo "  ✗ Missing hook: $HOOKS_DIR/$hook_file"
+    VERIFY_OK=false
+  fi
+done
+
+if ! node -e "
+  const s = require('fs').readFileSync('$SETTINGS_FILE', 'utf8');
+  const j = JSON.parse(s);
+  const ok =
+    JSON.stringify(j.hooks && j.hooks.SessionStart).includes('prove-it-activate') &&
+    JSON.stringify(j.hooks && j.hooks.UserPromptSubmit).includes('prove-it-mode-tracker') &&
+    JSON.stringify(j.statusLine).includes('prove-it-statusline');
+  process.exit(ok ? 0 : 1);
+" 2>/dev/null; then
+  echo "  ✗ settings.json hooks not registered correctly"
+  VERIFY_OK=false
+fi
+
+if [[ "$VERIFY_OK" == false ]]; then
+  echo ""
+  echo "  Installation incomplete. Try running with --force:"
+  echo "  bash hooks/install.sh --force"
+  exit 1
+fi
 
 # ─── Done ─────────────────────────────────────────────────────────────────────
 echo ""

@@ -29,28 +29,46 @@ Four hook files are written to `~/.claude/hooks/` and three entries are merged i
 |-----------|------|-------------|
 | `SessionStart` | `prove-it-activate.js` | Detects your project's language and test framework, emits `PROVE-IT ACTIVE` context block at the start of every session |
 | `UserPromptSubmit` | `prove-it-mode-tracker.js` | Parses `/prove-it` commands and updates the active mode |
-| `statusLine` | `prove-it-statusline.sh` | Adds a blue `[PROVE-IT]` badge to the Claude Code status bar |
+| `statusLine` | `prove-it-statusline.js` | Adds a blue `[PROVE-IT]` badge to the Claude Code status bar |
 
 ### Install
 
-**Option A — direct curl (no clone required):**
+**macOS / Linux — direct curl (no clone required):**
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/hooks/install.sh)
 ```
 
-**Option B — from a local clone:**
+**Windows — PowerShell one-liner (no clone required):**
+```powershell
+irm https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/hooks/install.ps1 | iex
+```
+
+**From a local clone (any platform):**
 ```bash
 git clone https://github.com/MeenakshiSundaram-MS/prove-it.git
 cd prove-it
+# macOS / Linux:
 bash hooks/install.sh
+# Windows:
+.\hooks\install.ps1
 ```
 
 **Reinstall / overwrite existing:**
 ```bash
+# macOS / Linux:
 bash hooks/install.sh --force
+# Windows:
+.\hooks\install.ps1 -Force
 ```
 
 ### Verify the install
+
+Run the verify command to confirm all hooks and settings are registered:
+```bash
+npx @developed-by-ms/prove-it verify
+```
+
+Or check manually:
 
 1. Start a **new** Claude Code session (existing sessions don't pick up new hooks).
 2. You should see this block near the top of the first response:
