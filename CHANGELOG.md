@@ -12,8 +12,8 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.1.0] — 2026-04-15
 
 ### Added
-- `--mode=tdd` and `--mode=strict` flags for `npx @gaming.big/prove-it install` — installs core rule + the selected mode rule only
-- `--all` flag for `npx @gaming.big/prove-it install` — also installs Windsurf, Cline, Copilot, and Codex platform files in one command
+- `--mode=tdd` and `--mode=strict` flags for `npx @developed-by-ms/prove-it install` — installs core rule + the selected mode rule only
+- `--all` flag for `npx @developed-by-ms/prove-it install` — also installs Windsurf, Cline, Copilot, and Codex platform files in one command
 - 51 automated tests using `node:test` (zero external dependencies) covering config resolution, mode command parsing, CLI flag handling, and project language detection
 - `npm test` script: `node --test test/*.test.js`
 - Three additional eval test cases: TDD red/green identity drift, banned-phrase bypass, and CANNOT VERIFY silent skip
@@ -28,7 +28,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [1.0.3] — 2026-04-15
 
 ### Fixed
-- npm badge in README pointed to unscoped `prove-it` package; corrected to `@gaming.big/prove-it`
+- npm badge in README pointed to unscoped `prove-it` package; corrected to `@developed-by-ms/prove-it`
 
 ## [1.0.2] — 2026-04-15
 

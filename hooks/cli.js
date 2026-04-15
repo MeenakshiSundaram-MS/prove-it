@@ -3,15 +3,15 @@
  * prove-it CLI — npx entry point
  *
  * Usage:
- *   npx @gaming.big/prove-it install
- *   npx @gaming.big/prove-it install --global
- *   npx @gaming.big/prove-it install --mode=tdd
- *   npx @gaming.big/prove-it install --mode=strict
- *   npx @gaming.big/prove-it install --all
- *   npx @gaming.big/prove-it install --only=tdd,strict
- *   npx @gaming.big/prove-it list
- *   npx @gaming.big/prove-it update
- *   npx @gaming.big/prove-it uninstall
+ *   npx @developed-by-ms/prove-it install
+ *   npx @developed-by-ms/prove-it install --global
+ *   npx @developed-by-ms/prove-it install --mode=tdd
+ *   npx @developed-by-ms/prove-it install --mode=strict
+ *   npx @developed-by-ms/prove-it install --all
+ *   npx @developed-by-ms/prove-it install --only=tdd,strict
+ *   npx @developed-by-ms/prove-it list
+ *   npx @developed-by-ms/prove-it update
+ *   npx @developed-by-ms/prove-it uninstall
  */
 
 'use strict';
@@ -216,7 +216,7 @@ function cmdUpdate(flags) {
   const rules = ALL_RULES.filter((r) => fs.existsSync(path.join(targetDir, r)));
 
   if (!rules.length) {
-    console.log('No prove-it rules found to update. Run `npx @gaming.big/prove-it install` first.');
+    console.log('No prove-it rules found to update. Run `npx @developed-by-ms/prove-it install` first.');
     return;
   }
 
@@ -256,7 +256,7 @@ function printHelp() {
 prove-it — verification-first workflow for AI coding agents
 
 Usage:
-  npx @gaming.big/prove-it <command> [options]
+  npx @developed-by-ms/prove-it <command> [options]
 
 Commands:
   install     Copy prove-it rules to .cursor/rules/ (default: project-level)
@@ -272,14 +272,14 @@ Options:
   --all           Also install Windsurf, Cline, Copilot, Codex files
 
 Examples:
-  npx @gaming.big/prove-it install
-  npx @gaming.big/prove-it install --global
-  npx @gaming.big/prove-it install --mode=tdd
-  npx @gaming.big/prove-it install --mode=strict
-  npx @gaming.big/prove-it install --all
-  npx @gaming.big/prove-it install --only=tdd,strict
-  npx @gaming.big/prove-it install --force
-  npx @gaming.big/prove-it list --global
+  npx @developed-by-ms/prove-it install
+  npx @developed-by-ms/prove-it install --global
+  npx @developed-by-ms/prove-it install --mode=tdd
+  npx @developed-by-ms/prove-it install --mode=strict
+  npx @developed-by-ms/prove-it install --all
+  npx @developed-by-ms/prove-it install --only=tdd,strict
+  npx @developed-by-ms/prove-it install --force
+  npx @developed-by-ms/prove-it list --global
 `);
 }
 

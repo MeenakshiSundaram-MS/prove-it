@@ -107,22 +107,22 @@ Three `.mdc` rule files are copied to your project's `.cursor/rules/` directory 
 
 **Project-level** (recommended — commit the rules so your whole team benefits):
 ```bash
-npx @gaming.big/prove-it install
+npx @developed-by-ms/prove-it install
 ```
 
 **Global** (applies to all your Cursor projects):
 ```bash
-npx @gaming.big/prove-it install --global
+npx @developed-by-ms/prove-it install --global
 ```
 
 **Specific modes only:**
 ```bash
-npx @gaming.big/prove-it install --only=tdd,strict
+npx @developed-by-ms/prove-it install --only=tdd,strict
 ```
 
 **Overwrite existing rules:**
 ```bash
-npx @gaming.big/prove-it install --force
+npx @developed-by-ms/prove-it install --force
 ```
 
 After project-level install, commit the rule files:
@@ -139,9 +139,9 @@ git commit -m "chore: add prove-it verification rules"
 
 To check which rules are installed:
 ```bash
-npx @gaming.big/prove-it list
+npx @developed-by-ms/prove-it list
 # or global:
-npx @gaming.big/prove-it list --global
+npx @developed-by-ms/prove-it list --global
 ```
 
 ### Switch modes
@@ -158,7 +158,7 @@ Enable at most one mode add-on at a time. If both TDD and strict are enabled sim
 ### Update rules to latest version
 
 ```bash
-npx @gaming.big/prove-it update
+npx @developed-by-ms/prove-it update
 ```
 
 Only updates rules that are already installed.
@@ -166,9 +166,9 @@ Only updates rules that are already installed.
 ### Uninstall
 
 ```bash
-npx @gaming.big/prove-it uninstall
+npx @developed-by-ms/prove-it uninstall
 # or global:
-npx @gaming.big/prove-it uninstall --global
+npx @developed-by-ms/prove-it uninstall --global
 ```
 
 ---
@@ -187,13 +187,13 @@ Windsurf reads all files in `.windsurf/rules/` as persistent context for Cascade
 **Step 1** — Copy the rule file into your project:
 ```bash
 # From the npm package:
-npx @gaming.big/prove-it install   # installs Cursor rules; then manually copy Windsurf file:
+npx @developed-by-ms/prove-it install   # installs Cursor rules; then manually copy Windsurf file:
 
 # Copy from the package directly:
 node -e "
   const src = require('path').join(
     require('child_process').execSync('npm root -g', {encoding:'utf8'}).trim(),
-    '@gaming.big/prove-it/.windsurf/rules/prove-it.md'
+    '@developed-by-ms/prove-it/.windsurf/rules/prove-it.md'
   );
   require('fs').mkdirSync('.windsurf/rules', {recursive:true});
   require('fs').copyFileSync(src, '.windsurf/rules/prove-it.md');
@@ -256,7 +256,7 @@ Or from the npm package:
 node -e "
   const src = require('path').join(
     require('child_process').execSync('npm root -g', {encoding:'utf8'}).trim(),
-    '@gaming.big/prove-it/.clinerules/prove-it.md'
+    '@developed-by-ms/prove-it/.clinerules/prove-it.md'
   );
   require('fs').mkdirSync('.clinerules', {recursive:true});
   require('fs').copyFileSync(src, '.clinerules/prove-it.md');

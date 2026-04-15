@@ -3,7 +3,7 @@
 > AI coding agents confidently ship broken code. prove-it fixes this.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![npm](https://img.shields.io/npm/v/%40gaming.big%2Fprove-it)](https://www.npmjs.com/package/@gaming.big/prove-it)
+[![npm](https://img.shields.io/npm/v/%40developed-by-ms%2Fprove-it)](https://www.npmjs.com/package/@developed-by-ms/prove-it)
 [![Works with Claude Code](https://img.shields.io/badge/Claude_Code-supported-blueviolet)](https://claude.ai/code)
 [![Works with Cursor](https://img.shields.io/badge/Cursor-supported-blue)](https://cursor.com)
 [![Works with Windsurf](https://img.shields.io/badge/Windsurf-supported-teal)](https://codeium.com/windsurf)
@@ -71,14 +71,14 @@ Switch modes with `/prove-it tdd`, `/prove-it strict`, `/prove-it off`.
 ### Cursor
 
 ```bash
-npx @gaming.big/prove-it install
+npx @developed-by-ms/prove-it install
 ```
 
 Copies three `.mdc` rule files to `.cursor/rules/`. `prove-it.mdc` is always-on. Toggle TDD and strict modes in **Cursor Settings → Rules**. Commit the files so your whole team gets them.
 
 ```bash
-npx @gaming.big/prove-it install --global   # applies to all your projects
-npx @gaming.big/prove-it install --force    # overwrite existing rules
+npx @developed-by-ms/prove-it install --global   # applies to all your projects
+npx @developed-by-ms/prove-it install --force    # overwrite existing rules
 ```
 
 ### Windsurf
