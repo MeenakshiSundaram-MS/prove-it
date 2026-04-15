@@ -58,33 +58,68 @@ Status: PASS ✓
 
 ## Install
 
-### Cursor / Windsurf / Cline (any AI IDE)
-
-```bash
-npx @gaming.big/prove-it install
-```
-
-Copies rule files to `.cursor/rules/` in your project. Commit them so your whole team benefits.
-
-```bash
-npx @gaming.big/prove-it install --global   # install to ~/.cursor/rules/ for all projects
-npx @gaming.big/prove-it install --only=tdd,strict   # install specific modes only
-```
-
 ### Claude Code
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/hooks/install.sh)
 ```
 
-Installs hooks that run at session start, detect your project's test framework, and emit the active rules into context automatically.
+Installs `SessionStart` and `UserPromptSubmit` hooks into `~/.claude/settings.json`. At session start, auto-detects your project's language and test framework, and emits a `PROVE-IT ACTIVE` context block. Adds a blue `[PROVE-IT]` badge to the status bar.
 
-### Manual (any platform)
+Switch modes with `/prove-it tdd`, `/prove-it strict`, `/prove-it off`.
 
-1. Copy `.cursor/rules/prove-it.mdc` into your project's `.cursor/rules/` directory
-2. For Windsurf: copy `.windsurf/rules/prove-it.md`
-3. For Cline: copy `.clinerules/prove-it.md`
-4. For Copilot: copy `.github/copilot-instructions.md`
+### Cursor
+
+```bash
+npx @gaming.big/prove-it install
+```
+
+Copies three `.mdc` rule files to `.cursor/rules/`. `prove-it.mdc` is always-on. Toggle TDD and strict modes in **Cursor Settings → Rules**. Commit the files so your whole team gets them.
+
+```bash
+npx @gaming.big/prove-it install --global   # applies to all your projects
+npx @gaming.big/prove-it install --force    # overwrite existing rules
+```
+
+### Windsurf
+
+```bash
+mkdir -p .windsurf/rules
+curl -fsSL https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/.windsurf/rules/prove-it.md \
+  -o .windsurf/rules/prove-it.md
+git add .windsurf/rules/prove-it.md && git commit -m "chore: add prove-it"
+```
+
+### Cline
+
+```bash
+mkdir -p .clinerules
+curl -fsSL https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/.clinerules/prove-it.md \
+  -o .clinerules/prove-it.md
+git add .clinerules/prove-it.md && git commit -m "chore: add prove-it"
+```
+
+### GitHub Copilot
+
+```bash
+mkdir -p .github
+curl -fsSL https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/.github/copilot-instructions.md \
+  -o .github/copilot-instructions.md
+git add .github/copilot-instructions.md && git commit -m "chore: add prove-it"
+```
+
+Applies to Copilot Chat (inline chat and chat panel). Requires workspace context to be enabled in VS Code.
+
+### Codex (OpenAI)
+
+```bash
+mkdir -p .codex
+curl -fsSL https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/.codex/instructions.md \
+  -o .codex/instructions.md
+git add .codex/instructions.md && git commit -m "chore: add prove-it"
+```
+
+For detailed setup, verification steps, and mode switching for every platform, see [AGENTS.md](AGENTS.md).
 
 ---
 
@@ -96,7 +131,7 @@ Installs hooks that run at session start, detect your project's test framework, 
 | `tdd` | New features, bug fixes | Write failing test (red), then implement (green) |
 | `strict` | Production, APIs, migrations | Compile ✓ + regression ✓ + new tests ✓ + edges ✓ |
 
-Switch modes in Cursor's rules panel (toggle `prove-it-tdd.mdc` or `prove-it-strict.mdc`), or in Claude Code: `/prove-it tdd`, `/prove-it strict`, `/prove-it off`.
+Switch modes in Cursor's rules panel (toggle `prove-it-tdd.mdc` or `prove-it-strict.mdc`), or in Claude Code: `/prove-it tdd`, `/prove-it strict`, `/prove-it off`. See [docs/modes.md](docs/modes.md) for mode switching on all platforms.
 
 ---
 
@@ -112,14 +147,14 @@ Switch modes in Cursor's rules panel (toggle `prove-it-tdd.mdc` or `prove-it-str
 
 ## Platform support
 
-| Platform | Method | Status |
-|----------|--------|--------|
-| Claude Code | SessionStart hook + UserPromptSubmit hook | ✓ Full (auto-detects framework, statusline badge) |
-| Cursor | `.cursor/rules/*.mdc` | ✓ Full (UI toggle, glob-aware) |
-| Windsurf | `.windsurf/rules/prove-it.md` | ✓ Supported |
-| Cline | `.clinerules/prove-it.md` | ✓ Supported |
-| GitHub Copilot | `.github/copilot-instructions.md` | ✓ Supported |
-| Codex | `.codex/instructions.md` | ✓ Supported |
+| Platform | Config file | Highlights |
+|----------|-------------|-----------|
+| [Claude Code](AGENTS.md#claude-code) | `~/.claude/settings.json` hooks | Auto-detects framework, `/prove-it` commands, statusline badge |
+| [Cursor](AGENTS.md#cursor) | `.cursor/rules/*.mdc` | UI toggle for TDD/strict modes, team-shareable via git |
+| [Windsurf](AGENTS.md#windsurf) | `.windsurf/rules/prove-it.md` | `trigger: always_on`, team-shareable via git |
+| [Cline](AGENTS.md#cline) | `.clinerules/prove-it.md` | Applies to every Cline task in the project |
+| [GitHub Copilot](AGENTS.md#github-copilot) | `.github/copilot-instructions.md` | Copilot Chat only (not inline completions) |
+| [Codex](AGENTS.md#codex-openai) | `.codex/instructions.md` | Applied as system instructions |
 
 ---
 
