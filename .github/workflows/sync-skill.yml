@@ -45,8 +45,8 @@ jobs:
             .windsurf/rules/prove-it.md \
             .clinerules/prove-it.md \
             .github/copilot-instructions.md \
-            .codex/instructions.md \
-            prove-it.skill
+            .codex/instructions.md
+          git add --force prove-it.skill
           git diff --staged --quiet || \
             git commit -m "chore: sync platform files from SKILL.md [skip ci]"
           git push

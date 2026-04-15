@@ -1,6 +1,6 @@
 {
   "name": "@gaming.big/prove-it",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Verification-first workflow for AI coding agents. Never say done without proof.",
   "keywords": [
     "ai",

@@ -1,22 +1,33 @@
 #!/usr/bin/env bash
 # prove-it installer for macOS and Linux
 #
-# Usage:
+# Usage — from a local clone:
 #   bash hooks/install.sh
 #   bash hooks/install.sh --force        # reinstall / overwrite existing
 #
+# Usage — direct curl install (no local clone needed):
+#   bash <(curl -fsSL https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/hooks/install.sh)
+#
 # What this does:
-#   1. Copies hook files to ~/.claude/hooks/
+#   1. Copies (or downloads) hook files to ~/.claude/hooks/
 #   2. Merges hook entries into ~/.claude/settings.json using Node.js
 #   3. Backs up settings.json before modification
 
 set -euo pipefail
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOOKS_DIR="$HOME/.claude/hooks"
 SETTINGS_FILE="$HOME/.claude/settings.json"
 BACKUP_FILE="$HOME/.claude/settings.json.prove-it-backup"
 FORCE=false
+
+GITHUB_RAW="https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main"
+
+HOOK_FILES=(
+  "prove-it-activate.js"
+  "prove-it-config.js"
+  "prove-it-mode-tracker.js"
+  "prove-it-statusline.sh"
+)
 
 # ─── Parse args ───────────────────────────────────────────────────────────────
 for arg in "$@"; do
@@ -25,6 +36,17 @@ for arg in "$@"; do
     *) echo "Unknown argument: $arg" && exit 1 ;;
   esac
 done
+
+# ─── Detect install mode: local clone vs curl pipe ────────────────────────────
+# When run via `bash <(curl ...)`, BASH_SOURCE[0] resolves to a /dev/fd/ path.
+# In that case download hook files from GitHub instead of copying them locally.
+SCRIPT_PATH="${BASH_SOURCE[0]:-}"
+if [[ -z "$SCRIPT_PATH" || "$SCRIPT_PATH" == /dev/fd/* || "$SCRIPT_PATH" == /proc/* ]]; then
+  INSTALL_MODE="curl"
+else
+  REPO_DIR="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
+  INSTALL_MODE="local"
+fi
 
 # ─── Checks ───────────────────────────────────────────────────────────────────
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
@@ -37,6 +59,11 @@ if ! command -v node &>/dev/null; then
   exit 1
 fi
 
+if [[ "$INSTALL_MODE" == "curl" ]] && ! command -v curl &>/dev/null; then
+  echo "Error: curl is required for remote installation but was not found."
+  exit 1
+fi
+
 # ─── Already installed check ──────────────────────────────────────────────────
 if [[ "$FORCE" == false ]] && [[ -f "$HOOKS_DIR/prove-it-activate.js" ]]; then
   echo "prove-it is already installed. Run with --force to reinstall."
@@ -46,12 +73,17 @@ fi
 # ─── Create hooks directory ───────────────────────────────────────────────────
 mkdir -p "$HOOKS_DIR"
 
-# ─── Copy hook files ──────────────────────────────────────────────────────────
+# ─── Install hook files ───────────────────────────────────────────────────────
 echo "Installing prove-it hooks..."
-cp "$REPO_DIR/hooks/prove-it-activate.js"    "$HOOKS_DIR/prove-it-activate.js"
-cp "$REPO_DIR/hooks/prove-it-config.js"      "$HOOKS_DIR/prove-it-config.js"
-cp "$REPO_DIR/hooks/prove-it-mode-tracker.js" "$HOOKS_DIR/prove-it-mode-tracker.js"
-cp "$REPO_DIR/hooks/prove-it-statusline.sh"  "$HOOKS_DIR/prove-it-statusline.sh"
+
+for hook_file in "${HOOK_FILES[@]}"; do
+  if [[ "$INSTALL_MODE" == "local" ]]; then
+    cp "$REPO_DIR/hooks/$hook_file" "$HOOKS_DIR/$hook_file"
+  else
+    curl -fsSL "$GITHUB_RAW/hooks/$hook_file" -o "$HOOKS_DIR/$hook_file"
+  fi
+done
+
 chmod +x "$HOOKS_DIR/prove-it-statusline.sh"
 
 # ─── Backup settings.json ────────────────────────────────────────────────────
@@ -88,7 +120,6 @@ const sessionStartHook = {
     command: `node "${path.join(hooksDir, 'prove-it-activate.js')}"`
   }]
 };
-// Add only if not already present
 const alreadyHasSessionStart = (settings.hooks.SessionStart || []).some(
   (h) => JSON.stringify(h).includes('prove-it-activate')
 );
@@ -125,29 +156,25 @@ fs.writeFileSync(settingsFile, JSON.stringify(settings, null, 2) + '\n', 'utf8')
 console.log('settings.json updated');
 EOF
 
-# ─── Detect project for post-install message ──────────────────────────────────
-PROJECT_INFO=$(node -e "
-const { detectProject } = (() => {
-  // Inline minimal detection for the install message
-  const fs = require('fs'), path = require('path');
-  function up(f, d) {
-    let dir = d; const root = path.parse(dir).root;
-    while (dir !== root) {
-      if (fs.existsSync(path.join(dir, f))) return path.join(dir, f);
-      dir = path.dirname(dir);
-    }
-    return null;
+# ─── Detect project language for post-install message ────────────────────────
+DETECTED_LANG=$(node -e "
+const fs = require('fs'), path = require('path');
+function findUp(filename, dir) {
+  const root = path.parse(dir).root;
+  while (dir !== root) {
+    if (fs.existsSync(path.join(dir, filename))) return true;
+    dir = path.dirname(dir);
   }
-  const cwd = process.cwd();
-  if (up('package.json', cwd)) return { lang: 'Node.js/TypeScript' };
-  if (up('go.mod', cwd)) return { lang: 'Go' };
-  if (up('Cargo.toml', cwd)) return { lang: 'Rust' };
-  if (up('pyproject.toml', cwd) || up('setup.py', cwd)) return { lang: 'Python' };
-  if (up('pom.xml', cwd)) return { lang: 'Java (Maven)' };
-  if (up('build.gradle', cwd)) return { lang: 'Java (Gradle)' };
-  return { lang: null };
-})();
-" 2>/dev/null || echo "")
+  return false;
+}
+const cwd = process.cwd();
+if (findUp('package.json', cwd)) { process.stdout.write('Node.js/TypeScript'); }
+else if (findUp('go.mod', cwd)) { process.stdout.write('Go'); }
+else if (findUp('Cargo.toml', cwd)) { process.stdout.write('Rust'); }
+else if (findUp('pyproject.toml', cwd) || findUp('setup.py', cwd)) { process.stdout.write('Python'); }
+else if (findUp('pom.xml', cwd)) { process.stdout.write('Java (Maven)'); }
+else if (findUp('build.gradle', cwd)) { process.stdout.write('Java (Gradle)'); }
+" 2>/dev/null || true)
 
 # ─── Done ─────────────────────────────────────────────────────────────────────
 echo ""
@@ -155,8 +182,8 @@ echo "✓ prove-it installed"
 echo ""
 echo "  Hooks installed to: $HOOKS_DIR"
 echo "  Settings updated:   $SETTINGS_FILE"
-if [[ -n "$PROJECT_INFO" ]]; then
-  echo "  Project detected:   $PROJECT_INFO"
+if [[ -n "$DETECTED_LANG" ]]; then
+  echo "  Project detected:   $DETECTED_LANG"
 fi
 echo ""
 echo "  prove-it is now active in all Claude Code sessions."

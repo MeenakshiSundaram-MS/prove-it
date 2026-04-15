@@ -3,8 +3,7 @@
  * prove-it-mode-tracker.js — Claude Code UserPromptSubmit hook
  *
  * Reads stdin for the user's prompt. Detects /prove-it commands and updates
- * the mode flag file. Also scans model output for VERIFICATION RESULT blocks
- * to write the last pass/fail result.
+ * the mode flag file accordingly.
  */
 
 'use strict';
@@ -52,15 +51,6 @@ function parseCommand(prompt) {
   return null;
 }
 
-function scanForVerificationResult(text) {
-  // Look for "Status: PASS ✓" or "Status: FAIL ✗" in the output
-  if (/Status:\s*PASS\s*✓/i.test(text)) return 'PASS';
-  if (/Status:\s*FAIL\s*✗/i.test(text)) return 'FAIL';
-  // Also match strict done blocks
-  if (/STRICT DONE/i.test(text) && /PASS ✓/i.test(text)) return 'PASS';
-  return null;
-}
-
 function main() {
   // Read prompt from stdin (Claude Code pipes the prompt as JSON or plain text)
   let input = '';
@@ -83,10 +73,6 @@ function main() {
   const cmd = parseCommand(prompt);
 
   if (!cmd) {
-    // Not a prove-it command — scan for verification results in case
-    // this is actually the model's response being piped through
-    const result = scanForVerificationResult(prompt);
-    if (result) writeFileSafe(LAST_RESULT_FILE, result);
     process.exit(0);
   }
 
