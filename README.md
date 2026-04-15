@@ -77,8 +77,24 @@ npx @developed-by-ms/prove-it install
 Copies three `.mdc` rule files to `.cursor/rules/`. `prove-it.mdc` is always-on. Toggle TDD and strict modes in **Cursor Settings → Rules**. Commit the files so your whole team gets them.
 
 ```bash
-npx @developed-by-ms/prove-it install --global   # applies to all your projects
-npx @developed-by-ms/prove-it install --force    # overwrite existing rules
+npx @developed-by-ms/prove-it install --global    # applies to all your projects
+npx @developed-by-ms/prove-it install --force     # overwrite existing rules
+npx @developed-by-ms/prove-it install --mode=tdd  # install core + TDD mode only
+```
+
+### All platforms at once
+
+If you use multiple AI tools in the same repo:
+
+```bash
+npx @developed-by-ms/prove-it install --all
+```
+
+Installs Cursor rules + Windsurf, Cline, Copilot, and Codex files in one command. Then commit everything:
+
+```bash
+git add .cursor .windsurf .clinerules .github/copilot-instructions.md .codex
+git commit -m "chore: add prove-it verification rules"
 ```
 
 ### Windsurf
