@@ -3,7 +3,7 @@
 > AI coding agents confidently ship broken code. prove-it fixes this.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![npm](https://img.shields.io/npm/v/prove-it)](https://www.npmjs.com/package/prove-it)
+[![npm](https://img.shields.io/npm/v/%40gaming.big%2Fprove-it)](https://www.npmjs.com/package/@gaming.big/prove-it)
 [![Works with Claude Code](https://img.shields.io/badge/Claude_Code-supported-blueviolet)](https://claude.ai/code)
 [![Works with Cursor](https://img.shields.io/badge/Cursor-supported-blue)](https://cursor.com)
 [![Works with Windsurf](https://img.shields.io/badge/Windsurf-supported-teal)](https://codeium.com/windsurf)
