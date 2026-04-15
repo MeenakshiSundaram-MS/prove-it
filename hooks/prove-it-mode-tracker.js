@@ -53,9 +53,10 @@ function parseCommand(prompt) {
 
 function main() {
   // Read prompt from stdin (Claude Code pipes the prompt as JSON or plain text)
+  // Use fd 0 instead of '/dev/stdin' — works on Windows, macOS, and Linux
   let input = '';
   try {
-    input = fs.readFileSync('/dev/stdin', 'utf8');
+    input = fs.readFileSync(0, 'utf8');
   } catch {
     process.exit(0);
   }
