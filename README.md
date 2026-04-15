@@ -60,11 +60,19 @@ Status: PASS ✓
 
 ### Claude Code
 
+**macOS / Linux:**
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/hooks/install.sh)
 ```
 
+**Windows:**
+```powershell
+irm https://raw.githubusercontent.com/MeenakshiSundaram-MS/prove-it/main/hooks/install.ps1 | iex
+```
+
 Installs `SessionStart` and `UserPromptSubmit` hooks into `~/.claude/settings.json`. At session start, auto-detects your project's language and test framework, and emits a `PROVE-IT ACTIVE` context block. Adds a blue `[PROVE-IT]` badge to the status bar.
+
+Confirm the install worked: `npx @developed-by-ms/prove-it verify`
 
 Switch modes with `/prove-it tdd`, `/prove-it strict`, `/prove-it off`.
 
