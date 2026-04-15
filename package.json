@@ -1,6 +1,6 @@
 {
   "name": "@gaming.big/prove-it",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Verification-first workflow for AI coding agents. Never say done without proof.",
   "keywords": [
     "ai",
@@ -26,7 +26,7 @@
   },
   "license": "MIT",
   "bin": {
-    "prove-it": "./bin/prove-it"
+    "prove-it": "bin/prove-it"
   },
   "files": [
     "bin/",
