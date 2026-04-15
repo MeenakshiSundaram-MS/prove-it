@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   release:
@@ -13,6 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
@@ -22,24 +24,22 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Check if version is already published
-        id: version_check
+      - name: Configure git
         run: |
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          PKG_NAME=$(node -p "require('./package.json').name")
-          echo "version=$PKG_VERSION" >> $GITHUB_OUTPUT
-          if npm view "${PKG_NAME}@${PKG_VERSION}" version 2>/dev/null; then
-            echo "already_published=true" >> $GITHUB_OUTPUT
-          else
-            echo "already_published=false" >> $GITHUB_OUTPUT
-          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump patch version
+        run: npm version patch --no-git-tag-version
+
+      - name: Commit and push version bump
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          git add package.json
+          git commit -m "chore: release v${VERSION} [skip ci]"
+          git push
 
       - name: Publish to npm
-        if: steps.version_check.outputs.already_published == 'false'
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Skip (version already published)
-        if: steps.version_check.outputs.already_published == 'true'
-        run: echo "v${{ steps.version_check.outputs.version }} is already on npm — bump the version to publish a new release."
