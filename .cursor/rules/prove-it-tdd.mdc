@@ -1,0 +1,84 @@
+---
+description: "prove-it TDD mode: write failing test first (show red), then implement (show green). Red→green for the same test."
+alwaysApply: false
+---
+
+# prove-it — TDD Mode
+
+Write the failing test first. Show it fails. Then implement. Show it passes.
+
+## Mandatory Sequence
+
+### 1 — Verification Plan
+```
+VERIFICATION PLAN
+─────────────────
+Test name:    [what the test asserts]
+Framework:    [jest / pytest / go test / cargo test / etc.]
+Failing for:  [why it will fail — function doesn't exist / wrong return / missing branch]
+```
+
+### 2 — Write the Failing Test
+
+Write ONLY the test. No implementation yet. A test that passes without any implementation is
+a bad test — fix it before proceeding.
+
+### 3 — Show Red
+```
+RED — expected failure
+──────────────────────
+Command: [test command]
+Output:
+  [paste actual failure output — the real error, not a summary]
+```
+
+### 4 — Implement
+
+Write the minimum code to make the test pass. No gold-plating beyond what the test requires.
+
+### 5 — Show Green
+```
+GREEN — passing
+───────────────
+Command: [same test command as RED]
+Output:
+  [paste actual passing output]
+```
+
+### 6 — Refactor (if any)
+
+If you refactor: re-run and show output again. A refactor that breaks tests is not a refactor — revert it.
+
+### 7 — Say Done
+
+Only after the GREEN block is shown.
+
+## Red→Green Integrity Rule
+
+The test name in RED and the test name in GREEN must be the same.
+
+Showing red on test A then green on test B is a violation — the test for the actual
+implementation was never proven to be failing first.
+
+If you notice this: go back, show the correct test failing, then show it passing.
+
+## When a Test Passes on First Run Without Implementation
+
+This means the test is not testing the right thing. Debug:
+- Is the assertion actually checking the new behavior?
+- Is there a pre-existing implementation that already satisfies the test?
+- Is the import path correct?
+
+Fix the test before writing implementation.
+
+## Refactoring Phase Rules
+
+- Refactor means: restructure without changing behavior
+- Every refactor must be followed by a passing test run
+- Show the test output after each refactor step
+- If a refactor introduces a failure: revert it and try a smaller change
+
+## Activation
+
+This rule is not `alwaysApply`. Enable it in Cursor's rules panel or type `/prove-it tdd`.
+Disable with `/prove-it verify` to return to default mode.

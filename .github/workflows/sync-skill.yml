@@ -1,0 +1,52 @@
+name: Sync SKILL.md to platform files
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/prove-it/SKILL.md'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Sync SKILL.md to all platform targets
+        run: node .github/scripts/sync-skill.js
+
+      - name: Build prove-it.skill archive
+        run: |
+          zip -r prove-it.skill \
+            skills/ \
+            .cursor/rules/ \
+            .windsurf/rules/ \
+            .clinerules/ \
+            .codex/ \
+            hooks/ \
+            -x "*.DS_Store"
+
+      - name: Commit synced files
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add \
+            .cursor/rules/prove-it.mdc \
+            .windsurf/rules/prove-it.md \
+            .clinerules/prove-it.md \
+            .github/copilot-instructions.md \
+            .codex/instructions.md \
+            prove-it.skill
+          git diff --staged --quiet || \
+            git commit -m "chore: sync platform files from SKILL.md [skip ci]"
+          git push

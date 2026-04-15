@@ -1,0 +1,49 @@
+{
+  "name": "prove-it",
+  "version": "1.0.0",
+  "description": "Verification-first workflow for AI coding agents. Never say done without proof.",
+  "keywords": [
+    "ai",
+    "cursor",
+    "claude",
+    "windsurf",
+    "cline",
+    "copilot",
+    "rules",
+    "verification",
+    "tdd",
+    "testing",
+    "workflow",
+    "agent-skills"
+  ],
+  "homepage": "https://github.com/MeenakshiSundaram-MS/prove-it#readme",
+  "bugs": {
+    "url": "https://github.com/MeenakshiSundaram-MS/prove-it/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MeenakshiSundaram-MS/prove-it.git"
+  },
+  "license": "MIT",
+  "bin": {
+    "prove-it": "./hooks/cli.js"
+  },
+  "files": [
+    ".cursor/",
+    ".windsurf/",
+    ".clinerules/",
+    ".github/copilot-instructions.md",
+    ".codex/",
+    "hooks/",
+    "skills/",
+    "docs/",
+    "examples/"
+  ],
+  "scripts": {
+    "install-hooks": "bash hooks/install.sh",
+    "uninstall-hooks": "bash hooks/uninstall.sh"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

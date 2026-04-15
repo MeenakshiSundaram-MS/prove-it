@@ -1,0 +1,135 @@
+---
+description: "prove-it strict mode: 4 gates — compile, regression, new tests, edge cases. All must pass. For production, security-sensitive code, and public APIs."
+alwaysApply: false
+---
+
+# prove-it — Strict Mode
+
+Four gates. All must show `PASS ✓`. None are optional.
+
+Use for: production features, security-sensitive code, public APIs, database migrations,
+anything with direct user-visible behavior.
+
+---
+
+## Gate 1 — Compile / Type Check
+
+Show the build is clean before running any tests.
+
+```
+GATE 1 — COMPILE
+─────────────────
+Command: [tsc --noEmit | cargo build | go build ./... | mvn compile -q | go vet ./...]
+Output:  [paste output — empty output means clean]
+Status:  PASS ✓
+```
+
+Language-specific Gate 1 commands:
+- **TypeScript:** `npx tsc --noEmit`
+- **Go:** `go build ./... && go vet ./...`
+- **Rust:** `cargo build` (cargo test includes this — run separately for clarity)
+- **Java/Maven:** `mvn compile -q`
+- **Java/Gradle:** `./gradlew compileJava`
+
+---
+
+## Gate 2 — Regression (existing test suite)
+
+The full existing test suite must pass. Zero regressions from this change.
+
+```
+GATE 2 — REGRESSION
+────────────────────
+Command: [full test suite command]
+Output:  [paste output — show total pass count]
+Status:  PASS ✓ (N tests, 0 failures)
+```
+
+### Pre-existing failures
+
+If the suite was already failing before your change, you must document it:
+
+```
+Pre-existing failure: [test name]
+Cause: [known issue / unrelated to this change]
+Evidence: [this test was failing on main before this branch]
+```
+
+Do NOT claim Gate 2 passes if pre-existing failures exist without documentation.
+Do NOT hide pre-existing failures by skipping them.
+
+---
+
+## Gate 3 — New Tests
+
+New behavior requires new tests. Show them passing.
+
+```
+GATE 3 — NEW TESTS
+───────────────────
+Tests added: [list test names or file path]
+Command:     [run new tests — filter to new tests if possible, else full suite]
+Output:      [paste passing output]
+Status:      PASS ✓ (M new tests)
+```
+
+If you cannot add tests (read-only test dir, external dependency with no test interface):
+document why and describe what manual verification covers it.
+
+---
+
+## Gate 4 — Edge Cases
+
+For every function added or modified, identify and handle:
+
+| Category         | Example                                     |
+|------------------|---------------------------------------------|
+| Null / nil       | `null`, `undefined`, `nil`, `None`          |
+| Empty collection | `[]`, `{}`, `""`, `0`                       |
+| Boundary values  | `INT_MAX`, `INT_MIN`, single-element lists  |
+| Error path       | network failure, invalid input, timeout     |
+| Concurrent access| if the code touches shared state            |
+
+```
+GATE 4 — EDGE CASES
+────────────────────
+Tested:     [list each case that has a test]
+Documented: [list each case intentionally skipped, with reason]
+```
+
+It is acceptable to document rather than test edge cases when:
+- The case is impossible given upstream validation (state the validation)
+- The case is handled by a tested library function (name the function)
+- Testing requires significant infrastructure not worth the scope (acknowledge the risk)
+
+Silently omitting edge cases is not acceptable.
+
+---
+
+## Strict Done
+
+Only say done after all four gates show `PASS ✓`:
+
+```
+STRICT DONE
+────────────
+Gate 1 (compile):    PASS ✓
+Gate 2 (regression): PASS ✓ (N tests)
+Gate 3 (new tests):  PASS ✓ (M new tests)
+Gate 4 (edges):      PASS ✓ (K tested, J documented)
+```
+
+If any gate is `FAIL ✗`: stop. Fix the gate. Re-run. Show the new output.
+
+---
+
+## Activation
+
+This rule is not `alwaysApply`. Enable it in Cursor's rules panel or type `/prove-it strict`.
+Disable with `/prove-it verify` to return to default mode.
+
+Not sure which mode to use?
+- Prototypes / spikes → `/prove-it off`
+- Day-to-day coding → `verify` (default, always on)
+- New features / bug fixes → `/prove-it tdd`
+- Production / security / APIs → `/prove-it strict` (this file)

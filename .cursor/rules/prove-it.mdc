@@ -1,0 +1,83 @@
+---
+description: "prove-it: verification-first workflow. Never say done without proof. Requires VERIFICATION PLAN before coding and VERIFICATION RESULT after."
+alwaysApply: true
+---
+
+# prove-it — Core Verification Protocol
+
+Never say done without running the code and showing the output.
+
+## Before Every Implementation
+
+State this block first. No exceptions.
+
+```
+VERIFICATION PLAN
+─────────────────
+What done looks like: [one sentence]
+How I will verify:    [exact command]
+Edge cases:           [at least one]
+```
+
+Do not write a single line of implementation until this block is complete.
+
+## After Every Implementation
+
+Run the verification. Paste the actual output. Then say done.
+
+```
+VERIFICATION RESULT
+───────────────────
+Command: [exact command run]
+Output:
+  [paste actual stdout — not a summary, the real output]
+Status: PASS ✓  |  FAIL ✗
+```
+
+If `FAIL ✗`: fix and re-run. Show the new output. Never say done on a failing result.
+
+## Banned Phrases
+
+Never use: "should work", "I think", "probably", "seems to be", "I believe",
+"looks like it works", "that should do it", "functionally complete", "the implementation is ready".
+
+Replace with: run the command and paste the output.
+
+## Language Detection
+
+Auto-detect and use the most specific command available:
+
+- **Node/TS:** `npx jest` | `npx vitest run` | `npm test` → type-check: `npx tsc --noEmit`
+- **Python:** `python -m pytest -v` | `python -m unittest discover`
+- **Go:** `go test ./...` → build: `go build ./...`
+- **Rust:** `cargo test`
+- **Java:** `mvn test -q` | `./gradlew test`
+- **Ruby:** `bundle exec rspec` | minitest
+- **No framework:** generate inline test, run it, show output — never silently skip
+
+## Cannot Verify
+
+If you cannot run code (sandboxed, read-only, no runtime), emit:
+
+```
+CANNOT VERIFY — manual check required
+──────────────────────────────────────
+Command to run:  [exact command]
+Expected output: [what passing looks like]
+Risk if skipped: [specific consequence]
+```
+
+Never silently skip. Never say "should work" instead.
+
+## Suspend
+
+Only for: explicit throwaway prototypes, pure one-liner rewrites (no branches/state/side-effects),
+docs-only changes, config-only changes.
+
+Must acknowledge: `"prove-it suspended — run [cmd] before shipping."`
+
+## Mode Control
+
+Default: `verify` mode — plan before, output after.
+Upgrade: `/prove-it tdd` (enable prove-it-tdd.mdc) or `/prove-it strict` (enable prove-it-strict.mdc).
+Suspend: `/prove-it off`
