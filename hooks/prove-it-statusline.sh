@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 # prove-it — statusline badge for Claude Code
 #
-# Displays a blue [PROVE-IT] badge with the current mode and last result.
+# Displays a blue [PROVE-IT] badge with the current mode.
 # Color: blue (ANSI 33 = 5;33 256-color), distinct from caveman's orange.
-# Last result indicator: ✓ (green) or ✗ (red)
 
 FLAG="$HOME/.claude/.prove-it-active"
-RESULT="$HOME/.claude/.prove-it-last-result"
 
 # If no flag file, prove-it is not installed — show nothing
 [ ! -f "$FLAG" ] && exit 0
@@ -19,17 +17,6 @@ if [ "$MODE" = "off" ]; then
   exit 0
 fi
 
-# Build result indicator
-INDICATOR=""
-if [ -f "$RESULT" ]; then
-  STATUS=$(cat "$RESULT" 2>/dev/null | tr -d '[:space:]')
-  if [ "$STATUS" = "PASS" ]; then
-    INDICATOR='\033[32m✓\033[0m'   # green check
-  elif [ "$STATUS" = "FAIL" ]; then
-    INDICATOR='\033[31m✗\033[0m'   # red x
-  fi
-fi
-
 # Build mode suffix
 if [ "$MODE" = "verify" ] || [ -z "$MODE" ]; then
   LABEL="PROVE-IT"
@@ -37,8 +24,7 @@ else
   LABEL="PROVE-IT:$(echo "$MODE" | tr '[:lower:]' '[:upper:]')"
 fi
 
-# Print badge: blue label + result indicator
+# Print badge in blue
 printf "\033[38;5;33m[%s]\033[0m" "$LABEL"
-[ -n "$INDICATOR" ] && printf "%b" "$INDICATOR"
 
 exit 0

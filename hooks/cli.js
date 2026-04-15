@@ -6,7 +6,9 @@
  *   npx @gaming.big/prove-it install
  *   npx @gaming.big/prove-it install --global
  *   npx @gaming.big/prove-it install --mode=tdd
- *   npx @gaming.big/prove-it install --only=commit,review
+ *   npx @gaming.big/prove-it install --mode=strict
+ *   npx @gaming.big/prove-it install --all
+ *   npx @gaming.big/prove-it install --only=tdd,strict
  *   npx @gaming.big/prove-it list
  *   npx @gaming.big/prove-it update
  *   npx @gaming.big/prove-it uninstall
@@ -17,7 +19,6 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { execSync } = require('child_process');
 
 const PACKAGE_DIR = path.resolve(__dirname, '..');
 const RULES_SOURCE = path.join(PACKAGE_DIR, '.cursor', 'rules');
@@ -26,6 +27,30 @@ const ALL_RULES = [
   'prove-it.mdc',
   'prove-it-tdd.mdc',
   'prove-it-strict.mdc',
+];
+
+// Platform files installed by --all (relative to project root)
+const PLATFORM_FILES = [
+  {
+    src: path.join(PACKAGE_DIR, '.windsurf', 'rules', 'prove-it.md'),
+    destRel: path.join('.windsurf', 'rules', 'prove-it.md'),
+    label: 'Windsurf',
+  },
+  {
+    src: path.join(PACKAGE_DIR, '.clinerules', 'prove-it.md'),
+    destRel: path.join('.clinerules', 'prove-it.md'),
+    label: 'Cline',
+  },
+  {
+    src: path.join(PACKAGE_DIR, '.github', 'copilot-instructions.md'),
+    destRel: path.join('.github', 'copilot-instructions.md'),
+    label: 'Copilot',
+  },
+  {
+    src: path.join(PACKAGE_DIR, '.codex', 'instructions.md'),
+    destRel: path.join('.codex', 'instructions.md'),
+    label: 'Codex',
+  },
 ];
 
 function parseArgs(argv) {
@@ -64,9 +89,17 @@ function getTargetDir(flags) {
 function resolveRules(flags) {
   if (flags.only) {
     const names = flags.only.split(',').map((n) => n.trim());
-    return names
-      .map((n) => (n.endsWith('.mdc') ? n : `prove-it-${n}.mdc`))
-      .filter((n) => ALL_RULES.includes(n) || n === 'prove-it.mdc');
+    const rules = names.map((n) => (n.endsWith('.mdc') ? n : `prove-it-${n}.mdc`));
+    // Always include core rule — without it the mode add-ons have nothing to build on
+    if (!rules.includes('prove-it.mdc')) rules.unshift('prove-it.mdc');
+    return rules.filter((n) => ALL_RULES.includes(n));
+  }
+  // --mode=tdd  → core + tdd rule only
+  // --mode=strict → core + strict rule only
+  // --mode=verify or no mode → all three rules
+  if (flags.mode && flags.mode !== 'verify') {
+    const modeRule = `prove-it-${flags.mode}.mdc`;
+    if (ALL_RULES.includes(modeRule)) return ['prove-it.mdc', modeRule];
   }
   return ALL_RULES;
 }
@@ -114,7 +147,54 @@ function cmdInstall(flags) {
   console.log(`\n  How to enable in Cursor:`);
   console.log(`    1. Open Cursor Settings → Rules`);
   console.log(`    2. prove-it.mdc is always-on by default`);
-  console.log(`    3. Toggle prove-it-tdd.mdc or prove-it-strict.mdc for those modes\n`);
+  console.log(`    3. Toggle prove-it-tdd.mdc or prove-it-strict.mdc for those modes`);
+
+  // --all: also install platform files for Windsurf, Cline, Copilot, Codex
+  if (flags.all && !flags.global) {
+    cmdInstallPlatforms(flags);
+  }
+
+  console.log('');
+}
+
+function cmdInstallPlatforms(flags) {
+  const projectRoot = findProjectRoot();
+  const platformInstalled = [];
+  const platformSkipped = [];
+
+  console.log(`\n  Installing platform files (--all):`);
+
+  for (const pf of PLATFORM_FILES) {
+    const dest = path.join(projectRoot, pf.destRel);
+
+    if (!fs.existsSync(pf.src)) {
+      console.warn(`  Warning: ${pf.label} source not found in package — skipping`);
+      continue;
+    }
+
+    if (fs.existsSync(dest) && !flags.force) {
+      platformSkipped.push(pf.label);
+      continue;
+    }
+
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.copyFileSync(pf.src, dest);
+    platformInstalled.push(`${pf.label} (${pf.destRel})`);
+  }
+
+  if (platformInstalled.length) {
+    console.log(`  Platform files installed:`);
+    platformInstalled.forEach((r) => console.log(`    + ${r}`));
+  }
+  if (platformSkipped.length) {
+    console.log(`  Platform files skipped (already exist — use --force to overwrite):`);
+    platformSkipped.forEach((r) => console.log(`    = ${r}`));
+  }
+  if (platformInstalled.length) {
+    console.log(`\n  Commit these files so your whole team gets them:`);
+    console.log(`    git add .windsurf .clinerules .github/copilot-instructions.md .codex`);
+    console.log(`    git commit -m "chore: add prove-it verification rules"`);
+  }
 }
 
 function cmdList(flags) {
@@ -185,13 +265,18 @@ Commands:
   uninstall   Remove prove-it rules
 
 Options:
-  --global      Install to ~/.cursor/rules/ instead of project
-  --force       Overwrite existing rules
-  --only=<r>    Install only specific rules (comma-separated: tdd,strict)
+  --global        Install to ~/.cursor/rules/ instead of project
+  --force         Overwrite existing rules
+  --mode=<mode>   Install core + mode rule only: tdd or strict
+  --only=<r>      Install only specific rules (comma-separated: tdd,strict)
+  --all           Also install Windsurf, Cline, Copilot, Codex files
 
 Examples:
   npx @gaming.big/prove-it install
   npx @gaming.big/prove-it install --global
+  npx @gaming.big/prove-it install --mode=tdd
+  npx @gaming.big/prove-it install --mode=strict
+  npx @gaming.big/prove-it install --all
   npx @gaming.big/prove-it install --only=tdd,strict
   npx @gaming.big/prove-it install --force
   npx @gaming.big/prove-it list --global
@@ -199,12 +284,17 @@ Examples:
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-const { command, flags } = parseArgs(process.argv);
 
-switch (command) {
-  case 'install':   cmdInstall(flags); break;
-  case 'list':      cmdList(flags); break;
-  case 'update':    cmdUpdate(flags); break;
-  case 'uninstall': cmdUninstall(flags); break;
-  default:          printHelp();
+module.exports = { parseArgs, resolveRules, findProjectRoot, getTargetDir };
+
+if (require.main === module) {
+  const { command, flags } = parseArgs(process.argv);
+
+  switch (command) {
+    case 'install':   cmdInstall(flags); break;
+    case 'list':      cmdList(flags); break;
+    case 'update':    cmdUpdate(flags); break;
+    case 'uninstall': cmdUninstall(flags); break;
+    default:          printHelp();
+  }
 }

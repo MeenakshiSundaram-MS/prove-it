@@ -18,7 +18,6 @@ const os = require('os');
 const { getDefaultMode, getConfig, VALID_MODES } = require('./prove-it-config');
 
 const FLAG_FILE = path.join(os.homedir(), '.claude', '.prove-it-active');
-const LAST_RESULT_FILE = path.join(os.homedir(), '.claude', '.prove-it-last-result');
 
 // ─── Mode flag file ───────────────────────────────────────────────────────────
 
@@ -334,4 +333,8 @@ function main() {
   process.stdout.write(lines.join('\n') + '\n');
 }
 
-main();
+module.exports = { detectProject, detectNodeFramework, detectPythonFramework, detectRubyFramework };
+
+if (require.main === module) {
+  main();
+}

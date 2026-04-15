@@ -123,4 +123,8 @@ function main() {
   process.exit(0);
 }
 
-main();
+module.exports = { parseCommand };
+
+if (require.main === module) {
+  main();
+}

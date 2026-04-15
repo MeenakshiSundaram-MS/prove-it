@@ -1,6 +1,6 @@
 {
   "name": "@gaming.big/prove-it",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Verification-first workflow for AI coding agents. Never say done without proof.",
   "keywords": [
     "ai",
@@ -38,9 +38,11 @@
     "hooks/",
     "skills/",
     "docs/",
-    "examples/"
+    "examples/",
+    "test/"
   ],
   "scripts": {
+    "test": "node --test test/*.test.js",
     "install-hooks": "bash hooks/install.sh",
     "uninstall-hooks": "bash hooks/uninstall.sh"
   },
