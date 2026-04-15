@@ -285,9 +285,7 @@ Examples:
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-module.exports = { parseArgs, resolveRules, findProjectRoot, getTargetDir };
-
-if (require.main === module) {
+function main() {
   const { command, flags } = parseArgs(process.argv);
 
   switch (command) {
@@ -297,4 +295,10 @@ if (require.main === module) {
     case 'uninstall': cmdUninstall(flags); break;
     default:          printHelp();
   }
+}
+
+module.exports = { parseArgs, resolveRules, findProjectRoot, getTargetDir, main };
+
+if (require.main === module) {
+  main();
 }
